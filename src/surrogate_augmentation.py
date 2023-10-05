@@ -2,6 +2,39 @@
 import numpy as np
 from numpy import random
 
+def white_noise_surrogates(original_data):
+    """
+    Return a shuffled copy of a time series array.
+
+    Each time series is shuffled individually. The surrogates correspond to
+    realizations of white noise consistent with the :attr:`original_data`
+    time series' amplitude distribution.
+
+    **Example** (Distributions of white noise surrogates should the same as
+    for the original data):
+
+    >>> ts = Surrogates.SmallTestData().original_data
+    >>> surrogates = Surrogates.\
+            SmallTestData().white_noise_surrogates(ts)
+    >>> np.allclose(np.histogram(ts[0,:])[0],
+    ...             np.histogram(surrogates[0,:])[0])
+    True
+
+    :type original_data: 2D array [index, time]
+    :arg original_data: The original time series.
+    :rtype: 2D array [index, time]
+    :return: The surrogate time series.
+    """
+    #  Generate reference to shuffle function
+    shuffle = random.shuffle
+
+    surrogates = original_data.copy()
+
+    for i in range(surrogates.shape[0]):
+        shuffle(surrogates[i, :])
+
+    return surrogates
+
 def correlated_noise_surrogates(original_data):
     """
     Return Fourier surrogates.
