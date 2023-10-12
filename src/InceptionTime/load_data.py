@@ -276,12 +276,12 @@ def _load_ucr_dataset(dataset, path):
 
     """
     new_path = os.path.join(path, dataset) + '/'
-    try:
-        with(open(new_path + dataset + '.txt', encoding='utf-8')) as f:
-            description = f.read()
-    except UnicodeDecodeError:
-        with(open(new_path + dataset + '.txt', encoding='ISO-8859-1')) as f:
-            description = f.read()
+    # try:
+    #     with(open(new_path + dataset + '.txt', encoding='utf-8')) as f:
+    #         description = f.read()
+    # except UnicodeDecodeError:
+    #     with(open(new_path + dataset + '.txt', encoding='ISO-8859-1')) as f:
+    #         description = f.read()
     try:
         data_train = np.genfromtxt(new_path + dataset + '_TRAIN.txt')
         data_test = np.genfromtxt(new_path + dataset + '_TEST.txt')
@@ -311,9 +311,9 @@ def _load_ucr_dataset(dataset, path):
     bunch = Bunch(
         data_train=X_train, target_train=y_train,
         data_test=X_test, target_test=y_test,
-        DESCR=description,
         url=("http://www.timeseriesclassification.com/"
              "description.php?Dataset={}".format(dataset))
     )
 
+       #DESCR=description,
     return bunch
