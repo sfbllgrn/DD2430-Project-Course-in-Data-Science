@@ -5,7 +5,7 @@ import time
 
 import keras.backend as K
 
-from utils import calculate_metrics
+from InceptionTime.utils import calculate_metrics
 
 def Recall(y_true, y_pred):
     y_true = K.ones_like(y_true)
@@ -32,7 +32,7 @@ def F1_score(y_true, y_pred):
 class Classifier_INCEPTION:
 
     def __init__(self, checkpoints_path, input_shape, nb_classes, save_weights=True,verbose=False, batch_size=64,
-                 nb_filters=32, use_residual=True, use_bottleneck=True, depth=6, kernel_size=41, nb_epochs=1500):
+                 nb_filters=32, use_residual=True, use_bottleneck=True, depth=6, kernel_size=41):
 
         self.checkpoints_path = checkpoints_path
         self.nb_filters = nb_filters
@@ -43,12 +43,9 @@ class Classifier_INCEPTION:
         self.callbacks = None
         self.batch_size = batch_size
         self.bottleneck_size = 32
-        self.nb_epochs = nb_epochs
         self.save_weights = save_weights
         self.verbose = verbose
         self.model = self.build_model(input_shape, nb_classes)
-        if (verbose == True):
-            self.model.summary()
 
         if self.save_weights:
             self.model.save_weights(self.checkpoints_path)
@@ -114,7 +111,7 @@ class Classifier_INCEPTION:
         return model
 
 
-    def fit(self, x_train, y_train, x_val, y_val, plot_test_acc=True):
+    def fit(self, x_train, y_train, x_val, y_val, nb_epochs, plot_test_acc=True):
         # x_val and y_val are only used to monitor the test loss and NOT for training
         if self.batch_size is None:
             mini_batch_size = int(min(x_train.shape[0] / 10, 16))
@@ -122,11 +119,11 @@ class Classifier_INCEPTION:
             mini_batch_size = self.batch_size
 
         if plot_test_acc:
-            hist = self.model.fit(x_train, y_train, batch_size=mini_batch_size, epochs=self.nb_epochs,
+            hist = self.model.fit(x_train, y_train, batch_size=mini_batch_size, epochs=nb_epochs,
                                   verbose=self.verbose, validation_data=(x_val, y_val), callbacks=self.callbacks)
         else:
-            hist = self.model.fit(x_train, y_train, batch_size=mini_batch_size, epochs=self.nb_epochs,
-                                  verbose=self.verbose, callbacks=self.callbacks)
+            hist = self.model.fit(x_train, y_train, batch_size=mini_batch_size, epochs=nb_epochs,
+                                  verbose=self.verbose)
         return hist
    
 
