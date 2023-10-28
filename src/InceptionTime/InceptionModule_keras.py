@@ -100,11 +100,11 @@ class Classifier_INCEPTION:
         gap_layer = keras.layers.GlobalAveragePooling1D()(x)
         output_layer = keras.layers.Dense(nb_classes, activation='softmax')(gap_layer)
         model = keras.models.Model(inputs=input_layer, outputs=output_layer)
-        model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(learning_rate=self.lr, weight_decay=self.wd),
+        model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(learning_rate=self.lr, epsilon=0.1, weight_decay=self.wd),
                       metrics=['accuracy', F1_score, Precision, Recall])
         
         # Callbacks
-        self.callbacks = []
+        self.callbacks = [keras.callbacks.ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=50, min_lr=1e-6)]
         if self.early_stop:
             early_stopping = keras.callbacks.EarlyStopping(monitor="val_loss", min_delta=1e-3, patience=50, restore_best_weights=True)
             self.callbacks.append(early_stopping)
