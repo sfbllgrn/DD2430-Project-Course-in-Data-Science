@@ -1,4 +1,5 @@
 # resnet model
+from socketserver import ThreadingUDPServer
 import keras
 import numpy as np
 import time
@@ -32,8 +33,11 @@ def F1_score(y_true, y_pred):
 class Classifier_INCEPTION:
 
     def __init__(self, checkpoints_path, input_shape, nb_classes, save_weights=True,verbose=False, batch_size=64,
-                 nb_filters=32, use_residual=True, use_bottleneck=True, depth=6, kernel_size=41):
+                 nb_filters=32, use_residual=True, use_bottleneck=True, depth=6, kernel_size=41, lr=0.001, wd=None, early_stop=True):
 
+        self.early_stop = early_stop
+        self.lr = lr
+        self.wd = wd
         self.checkpoints_path = checkpoints_path
         self.nb_filters = nb_filters
         self.use_residual = use_residual
@@ -96,13 +100,14 @@ class Classifier_INCEPTION:
         gap_layer = keras.layers.GlobalAveragePooling1D()(x)
         output_layer = keras.layers.Dense(nb_classes, activation='softmax')(gap_layer)
         model = keras.models.Model(inputs=input_layer, outputs=output_layer)
-        model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(),
+        model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(learning_rate=self.lr, weight_decay=self.wd),
                       metrics=['accuracy', F1_score, Precision, Recall])
         
         # Callbacks
-        reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=10, min_lr=1e-5)
-        early_stopping = keras.callbacks.EarlyStopping(monitor="val_loss", min_delta=1e-2, patience=10)
-        self.callbacks = [reduce_lr, early_stopping]
+        self.callbacks = []
+        if self.early_stop:
+            early_stopping = keras.callbacks.EarlyStopping(monitor="val_loss", min_delta=1e-3, patience=50, restore_best_weights=True)
+            self.callbacks.append(early_stopping)
 
         if self.save_weights:
             model_checkpoint = keras.callbacks.ModelCheckpoint(filepath=self.checkpoints_path, monitor='val_loss', save_best_only=True)
