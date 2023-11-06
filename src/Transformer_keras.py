@@ -9,6 +9,8 @@ import keras.backend as K
 
 from InceptionTime.utils import calculate_metrics
 
+# NILS NOTE: These functions are not used anymore since there were problems with saving/loading
+# them! Instead, keras.metrics.function are used in the model.compile function!
 def Recall(y_true, y_pred):
     y_true = K.ones_like(y_true)
     true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
@@ -89,7 +91,7 @@ class Classifier_TRANSFORMER:
         model = keras.Model(inputs=input_layer, outputs=output_layer)
 
         model.compile(loss="categorical_crossentropy", optimizer=keras.optimizers.Adam(learning_rate=self.lr),
-        metrics=["accuracy", F1_score, Precision, Recall])
+                       metrics=['accuracy', keras.metrics.Recall(), keras.metrics.Precision(), keras.metrics.AUC(name='f1_score')]
 
         # Callbacks
         self.callbacks = [keras.callbacks.ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=50, min_lr=1e-6)]
