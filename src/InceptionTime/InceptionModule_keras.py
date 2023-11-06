@@ -8,6 +8,8 @@ import keras.backend as K
 
 from InceptionTime.utils import calculate_metrics
 
+# NILS NOTE: These functions are not used anymore since there were problems with saving/loading
+# them! Instead, keras.metrics.function are used in the model.compile function!
 def Recall(y_true, y_pred):
     y_true = K.ones_like(y_true)
     true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
@@ -30,7 +32,6 @@ def F1_score(y_true, y_pred):
     return 2*((precision*recall)/(precision+recall+K.epsilon()))
 
 
-@keras.saving.register_keras_serializable()
 class Classifier_INCEPTION:
 
     def __init__(self, checkpoints_path, input_shape, nb_classes, save_weights=True,verbose=False, batch_size=64,
@@ -102,7 +103,7 @@ class Classifier_INCEPTION:
         output_layer = keras.layers.Dense(nb_classes, activation='softmax')(gap_layer)
         model = keras.models.Model(inputs=input_layer, outputs=output_layer)
         model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(learning_rate=self.lr, epsilon=0.1, weight_decay=self.wd),
-                      metrics=['accuracy', F1_score, Precision, Recall])
+                      metrics=['accuracy', keras.metrics.Recall(), keras.metrics.Precision(), keras.metrics.AUC(name='f1_score')])
         
         # Callbacks
         self.callbacks = [keras.callbacks.ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=50, min_lr=1e-6)]
