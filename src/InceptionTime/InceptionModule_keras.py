@@ -30,6 +30,7 @@ def F1_score(y_true, y_pred):
     return 2*((precision*recall)/(precision+recall+K.epsilon()))
 
 
+@keras.saving.register_keras_serializable()
 class Classifier_INCEPTION:
 
     def __init__(self, checkpoints_path, input_shape, nb_classes, save_weights=True,verbose=False, batch_size=64,
