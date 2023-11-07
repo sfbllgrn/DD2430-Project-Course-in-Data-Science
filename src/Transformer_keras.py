@@ -91,7 +91,7 @@ class Classifier_TRANSFORMER:
         model = keras.Model(inputs=input_layer, outputs=output_layer)
 
         model.compile(loss="categorical_crossentropy", optimizer=keras.optimizers.Adam(learning_rate=self.lr),
-                       metrics=['accuracy', keras.metrics.Recall(), keras.metrics.Precision(), keras.metrics.AUC(name='f1_score')]
+                       metrics=['accuracy', keras.metrics.Recall(), keras.metrics.Precision(), keras.metrics.AUC(name='f1_score')])
 
         # Callbacks
         self.callbacks = [keras.callbacks.ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=50, min_lr=1e-6)]
