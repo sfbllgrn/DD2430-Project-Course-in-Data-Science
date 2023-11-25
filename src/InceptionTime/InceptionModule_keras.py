@@ -102,8 +102,13 @@ class Classifier_INCEPTION:
         gap_layer = keras.layers.GlobalAveragePooling1D()(x)
         output_layer = keras.layers.Dense(nb_classes, activation='softmax')(gap_layer)
         model = keras.models.Model(inputs=input_layer, outputs=output_layer)
-        model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(learning_rate=self.lr, epsilon=0.1, weight_decay=self.wd),
-                      metrics=['accuracy', keras.metrics.Recall(), keras.metrics.Precision(), keras.metrics.AUC(name='f1_score')])
+        
+        lr_schedule = keras.optimizers.schedules.ExponentialDecay(self.lr,decay_steps=100000,
+        decay_rate=0.96,staircase=True)
+        model.compile(loss='categorical_crossentropy', 
+                      optimizer=keras.optimizers.Adam(learning_rate=lr_schedule, epsilon=0.1, 
+                                                      weight_decay=self.wd),
+                      metrics=['accuracy', keras.metrics.F1Score(average="micro")])
         
         # Callbacks
         self.callbacks = [keras.callbacks.ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=50, min_lr=1e-6)]
