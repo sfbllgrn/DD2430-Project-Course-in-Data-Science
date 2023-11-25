@@ -90,7 +90,7 @@ class Classifier_TRANSFORMER:
         
         model = keras.Model(inputs=input_layer, outputs=output_layer)
 
-        initial_learning_rate = 0.1
+        initial_learning_rate = self.lr
         lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
             initial_learning_rate,
             decay_steps=100000,
@@ -98,7 +98,7 @@ class Classifier_TRANSFORMER:
             staircase=True)
         
         model.compile(loss="categorical_crossentropy", optimizer=keras.optimizers.Adam(learning_rate=lr_schedule),
-                       metrics=['accuracy', keras.metrics.AUC(name='f1_score')])
+                       metrics=['accuracy', keras.metrics.F1Score(average="micro")])
 
         # Callbacks
         self.callbacks = [keras.callbacks.ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=50, min_lr=1e-6)]
