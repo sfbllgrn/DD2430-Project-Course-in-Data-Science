@@ -90,18 +90,15 @@ class Classifier_TRANSFORMER:
         
         model = keras.Model(inputs=input_layer, outputs=output_layer)
 
-        initial_learning_rate = self.lr
-        lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
-            initial_learning_rate,
-            decay_steps=100000,
-            decay_rate=0.96,
-            staircase=True)
-        
+        lr_schedule = keras.optimizers.schedules.ExponentialDecay(self.lr, decay_steps=1000,
+                    decay_rate=0.50, staircase=False)
+        lr_callback = keras.callbacks.LearningRateScheduler(lr_schedule)
         model.compile(loss="categorical_crossentropy", optimizer=keras.optimizers.Adam(learning_rate=lr_schedule),
-                       metrics=['accuracy', keras.metrics.F1Score(average="micro")])
+                       metrics=['accuracy', keras.metrics.F1Score(average="macro")])
 
         # Callbacks
-        self.callbacks = [keras.callbacks.ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=50, min_lr=1e-6)]
+        #keras.callbacks.ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=50, min_lr=1e-6)
+        self.callbacks = [lr_callback]
         if self.early_stop:
             early_stopping = keras.callbacks.EarlyStopping(monitor="val_loss", min_delta=1e-3, patience=50, restore_best_weights=True)
             self.callbacks.append(early_stopping)
