@@ -106,12 +106,12 @@ class Classifier_INCEPTION:
         lr_schedule = keras.optimizers.schedules.ExponentialDecay(self.lr,decay_steps=100000,
         decay_rate=0.96,staircase=True)
         model.compile(loss='categorical_crossentropy', 
-                      optimizer=keras.optimizers.Adam(learning_rate=lr_schedule, epsilon=0.1, 
-                                                      weight_decay=self.wd),
-                      metrics=['accuracy', keras.metrics.F1Score(average="micro")])
+                      optimizer=keras.optimizers.Adam(learning_rate=lr_schedule, epsilon=0.1),
+                      metrics=['accuracy', keras.metrics.F1Score(average="macro")])
         
         # Callbacks
-        self.callbacks = [keras.callbacks.ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=50, min_lr=1e-6)]
+        #keras.callbacks.ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=50, min_lr=1e-6)
+        self.callbacks = []
         if self.early_stop:
             early_stopping = keras.callbacks.EarlyStopping(monitor="val_loss", min_delta=1e-3, patience=50, restore_best_weights=True)
             self.callbacks.append(early_stopping)
