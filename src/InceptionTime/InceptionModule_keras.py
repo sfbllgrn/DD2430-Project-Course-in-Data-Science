@@ -103,8 +103,8 @@ class Classifier_INCEPTION:
         output_layer = keras.layers.Dense(nb_classes, activation='softmax')(gap_layer)
         model = keras.models.Model(inputs=input_layer, outputs=output_layer)
         
-        lr_schedule = keras.optimizers.schedules.ExponentialDecay(self.lr,decay_steps=50000,
-                    decay_rate=0.90, staircase=False)
+        lr_schedule = keras.optimizers.schedules.ExponentialDecay(self.lr,decay_steps=1000,
+                    decay_rate=0.50, staircase=False)
         lr_callback = keras.callbacks.LearningRateScheduler(lr_schedule)
         model.compile(loss='categorical_crossentropy', 
                       optimizer=keras.optimizers.Adam(learning_rate=lr_schedule, epsilon=0.1),
