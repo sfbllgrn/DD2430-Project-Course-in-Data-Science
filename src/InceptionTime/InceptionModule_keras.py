@@ -114,7 +114,7 @@ class Classifier_INCEPTION:
         #keras.callbacks.ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=50, min_lr=1e-6)
         self.callbacks = [lr_callback]
         if self.early_stop:
-            early_stopping = keras.callbacks.EarlyStopping(monitor="val_loss", min_delta=1e-3, patience=50, restore_best_weights=True)
+            early_stopping = keras.callbacks.EarlyStopping(monitor="val_loss", min_delta=1e-3, patience=10, restore_best_weights=True)
             self.callbacks.append(early_stopping)
 
         if self.save_weights:
